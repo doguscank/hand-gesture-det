@@ -23,10 +23,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Predict hand gesture from image using YOLO and AutoGluon"
     )
-    parser.add_argument("image", type=str, help="Path to the image file")
-    parser.add_argument("yolo_model", type=str, help="Path to the YOLO model file")
+    parser.add_argument("--image", type=str, help="Path to the image file")
+    parser.add_argument("--yolo-model", type=str, help="Path to the YOLO model file")
     parser.add_argument(
-        "autogluon_model", type=str, help="Path to the saved AutoGluon model"
+        "--autogluon-model", type=str, help="Path to the saved AutoGluon model"
     )
     args = parser.parse_args()
 

@@ -1,9 +1,9 @@
-import argparse  # added argparse import
+import argparse
 import json
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
-from sklearn.metrics import (  # updated metrics imports
+from sklearn.metrics import (
     accuracy_score,
     classification_report,
     confusion_matrix,
@@ -23,24 +23,23 @@ def main() -> None:
     -------
     None
     """
-    # Argument parser added
     parser = argparse.ArgumentParser(
         description="Validate the AutoGluon model for hand gesture detection."
     )
     parser.add_argument(
-        "--model_path",
+        "--model-path",
         type=str,
         default="./weights/autogluon_model",
         help="Directory path of the saved model.",
     )
     parser.add_argument(
-        "--data_root",
+        "--data-root",
         type=str,
         default="./data",
         help="Root directory for the dataset JSON files.",
     )
     parser.add_argument(
-        "--mapping_out",
+        "--mapping-out",
         type=str,
         default="./autogluon_mapping.json",
         help="Output path for the validation mapping JSON file.",

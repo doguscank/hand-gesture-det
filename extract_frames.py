@@ -69,27 +69,27 @@ def extract_frames_from_videos(
 if __name__ == "__main__":
     video_paths: Dict[str, List[str]] = {
         "stop": [
-            "/home/doguscank/holonext_ws/data/self/stop/VID_20250206_223146.mp4",
-            "/home/doguscank/holonext_ws/data/self/stop/WIN_20250206_22_29_49_Pro.mp4",
+            "./data/stop/VID_20250206_223146.mp4",
+            "./data/stop/WIN_20250206_22_29_49_Pro.mp4",
         ],
         "four": [
-            "/home/doguscank/holonext_ws/data/self/four/VID_20250206_223207.mp4",
-            "/home/doguscank/holonext_ws/data/self/four/WIN_20250206_22_30_28_Pro.mp4",
+            "./data/four/VID_20250206_223207.mp4",
+            "./data/four/WIN_20250206_22_30_28_Pro.mp4",
         ],
         "five": [
-            "/home/doguscank/holonext_ws/data/self/five/VID_20250206_223245.mp4",
-            "/home/doguscank/holonext_ws/data/self/five/WIN_20250206_22_29_03_Pro.mp4",
+            "./data/five/VID_20250206_223245.mp4",
+            "./data/five/WIN_20250206_22_29_03_Pro.mp4",
         ],
         "none": [
-            "/home/doguscank/holonext_ws/data/self/none/VID_20250206_230620.mp4",
-            "/home/doguscank/holonext_ws/data/self/none/VID_20250206_230629.mp4",
-            "/home/doguscank/holonext_ws/data/self/none/VID_20250206_230637.mp4",
-            "/home/doguscank/holonext_ws/data/self/none/VID_20250206_230647.mp4",
-            "/home/doguscank/holonext_ws/data/self/none/VID_20250206_230723.mp4",
+            "./data/none/VID_20250206_230620.mp4",
+            "./data/none/VID_20250206_230629.mp4",
+            "./data/none/VID_20250206_230637.mp4",
+            "./data/none/VID_20250206_230647.mp4",
+            "./data/none/VID_20250206_230723.mp4",
         ],
     }
 
-    save_path_template: str = "/home/doguscank/holonext_ws/data/self/{name}/frames"
+    save_path_template: str = "./data/{name}/frames"
     save_each_n_frame: int = 10
 
     extract_frames_from_videos(video_paths, save_path_template, save_each_n_frame)

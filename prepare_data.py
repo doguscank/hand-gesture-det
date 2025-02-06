@@ -1,18 +1,13 @@
 import argparse  # Added for argument parsing
 
-from det_keypoints import (
-    Dataset,
-    init_detector,
-    process_folder,
-    save_results,
-)
+from det_keypoints import Dataset, init_detector, process_folder, save_results
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Prepare data for hand gesture detection."
     )
     parser.add_argument(
-        "--dataset_dir",
+        "--dataset-dir",
         type=str,
         default="./data",
         help="Directory containing the datasets",

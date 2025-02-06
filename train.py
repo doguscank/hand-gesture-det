@@ -3,10 +3,7 @@ import argparse
 import pandas as pd
 from autogluon.tabular import TabularPredictor
 
-from utils import (
-    create_train_val_split,
-    load_and_combine,
-)
+from utils import create_train_val_split, load_and_combine
 
 
 def train_model(
@@ -49,13 +46,13 @@ def main() -> None:
         description="Train the AutoGluon model for hand gesture detection."
     )
     parser.add_argument(
-        "--model_path",
+        "--model-path",
         type=str,
         default="./weights/autogluon_model",
         help="Directory path to save the trained model.",
     )
     parser.add_argument(
-        "--data_root",
+        "--data-root",
         type=str,
         default="./data",
         help="Root directory for the dataset JSON files.",
