@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
@@ -7,7 +7,7 @@ from autogluon.tabular import TabularPredictor
 
 def load_and_flatten(json_path: str, label_map: Dict[str, str]) -> pd.DataFrame:
     """
-    Load JSON file and flatten keypoints into a DataFrame.
+    Load a JSON file and flatten keypoints into a DataFrame.
 
     Parameters
     ----------
@@ -23,7 +23,6 @@ def load_and_flatten(json_path: str, label_map: Dict[str, str]) -> pd.DataFrame:
     """
     with open(json_path, "r") as f:
         data = json.load(f)
-
     records = []
     for sample, details in data.items():
         record = {}
@@ -76,7 +75,7 @@ def create_train_val_split(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     Returns
     -------
     tuple of (pd.DataFrame, pd.DataFrame)
-        A tuple (df_train, df_val) of shuffled DataFrames for training and validation.
+        A tuple (df_train, df_val) containing the training and validation DataFrames.
     """
     train_list = []
     val_list = []
@@ -92,55 +91,6 @@ def create_train_val_split(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     return df_train, df_val
 
 
-def train_model(
-    df_train: pd.DataFrame, df_val: pd.DataFrame, model_path: str
-) -> Tuple[TabularPredictor, pd.DataFrame]:
-    """
-    Train the AutoGluon model using provided training and validation splits,
-    and save the model to the given path.
-
-    Parameters
-    ----------
-    df_train : pd.DataFrame
-        Training data.
-    df_val : pd.DataFrame
-        Validation data.
-    model_path : str
-        Directory path to save the trained model.
-
-    Returns
-    -------
-    tuple
-        A tuple (predictor, df_val) where predictor is the trained model.
-    """
-    tuning_data = df_val.drop(columns=["img_path"])
-    predictor = TabularPredictor(label="class", path=model_path).fit(
-        train_data=df_train, tuning_data=tuning_data, presets="medium"
-    )
-    return predictor, df_val
-
-
-def predict(predictor: TabularPredictor, sample_json: str) -> pd.Series:
-    """
-    Predict classes for samples in a given JSON file.
-
-    Parameters
-    ----------
-    predictor : TabularPredictor
-        Trained AutoGluon predictor.
-    sample_json : str
-        Path to the JSON file with samples.
-
-    Returns
-    -------
-    pd.Series
-        Predictions for each sample.
-    """
-    df_sample = load_and_combine({"dummy": sample_json})
-    df_sample = df_sample.drop(columns=["class"])
-    return predictor.predict(df_sample)
-
-
 def load_model(model_path: str) -> TabularPredictor:
     """
     Load a saved AutoGluon model.
@@ -148,7 +98,7 @@ def load_model(model_path: str) -> TabularPredictor:
     Parameters
     ----------
     model_path : str
-        Path to the saved model.
+        Path to the saved model directory.
 
     Returns
     -------
@@ -158,35 +108,23 @@ def load_model(model_path: str) -> TabularPredictor:
     return TabularPredictor.load(model_path)
 
 
-def main() -> None:
+def build_features_from_keypoints(keypoints: List[Dict[str, Any]]) -> Dict[str, float]:
     """
-    Combine JSON data, train the AutoGluon model, perform a validation prediction,
-    and save the image-path-to-prediction mapping.
+    Build feature dictionary from keypoints.
+
+    Parameters
+    ----------
+    keypoints : List[Dict[str, Any]]
+        List of keypoint dictionaries. Each dictionary is expected to have keys
+        'rel_x' and 'rel_y' representing normalized coordinates.
 
     Returns
     -------
-    None
+    Dict[str, float]
+        Dictionary with keys formatted as "kp{index}_rel_x" and "kp{index}_rel_y".
     """
-    json_paths = {
-        "five": "/home/doguscank/holonext_ws/data/self/five/bbox_keypoints.json",
-        "four": "/home/doguscank/holonext_ws/data/self/four/bbox_keypoints.json",
-        "stop": "/home/doguscank/holonext_ws/data/self/stop/bbox_keypoints.json",
-        "none": "/home/doguscank/holonext_ws/data/self/none/bbox_keypoints.json",
-    }
-    df = load_and_combine(json_paths)
-    df_train, df_val = create_train_val_split(df)
-    model_save_path = "/home/doguscank/holonext_ws/autogluon_model"
-    predictor, df_val = train_model(df_train, df_val, model_save_path)
-    df_val_features = df_val.drop(columns=["class", "img_path"])
-    val_predictions = predictor.predict(df_val_features)
-    mapping = pd.DataFrame(
-        {"img_path": df_val["img_path"].values, "prediction": val_predictions.values}
-    ).to_dict(orient="index")
-    mapping_out = "/home/doguscank/holonext_ws/autogluon_mapping.json"
-    with open(mapping_out, "w") as f:
-        json.dump(mapping, f)
-    print("Mapping saved at:", mapping_out)
-
-
-if __name__ == "__main__":
-    main()
+    features = {}
+    for idx, kp in enumerate(keypoints):
+        features[f"kp{idx}_rel_x"] = kp.get("rel_x", 0)
+        features[f"kp{idx}_rel_y"] = kp.get("rel_y", 0)
+    return features

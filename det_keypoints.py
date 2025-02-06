@@ -104,7 +104,7 @@ def detect_keypoints(image: Any, model: YOLO) -> Optional[Dict[str, Any]]:
     Parameters
     ----------
     image : Any
-        Input image for detection.
+        Input image or image path for detection.
     model : YOLO
         YOLO model instance.
 
@@ -168,20 +168,3 @@ def save_results(name: str, data: Dict[str, Any], output_dir: str) -> None:
     output_file = f"{output_dir}/{name}/bbox_keypoints.json"
     with open(output_file, "w") as f:
         json.dump(data, f)
-
-
-if __name__ == "__main__":
-    datasets = [
-        Dataset("five", "/home/doguscank/holonext_ws/data/self/five/frames"),
-        Dataset("four", "/home/doguscank/holonext_ws/data/self/four/frames"),
-        Dataset("stop", "/home/doguscank/holonext_ws/data/self/stop/frames"),
-        Dataset("none", "/home/doguscank/holonext_ws/data/self/none/frames"),
-    ]
-
-    dataset_dir = "/home/doguscank/holonext_ws/data/self"
-
-    model = init_detector("/home/doguscank/holonext_ws/hand-gesture-det/best.pt")
-
-    for ds in datasets:
-        results = process_folder(ds.name, ds.folder_path, model)
-        save_results(ds.name, results, dataset_dir)
