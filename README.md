@@ -32,9 +32,11 @@ The self-collected dataset includes images for all defined classes. In the case 
 
 ### Pre-processing
 
-During pre-processing, hand keypoints are detected using YOLOv11. Images that do not yield detected keypoints are omitted from the dataset. After keypoint extraction, the relative distances from the top-left corner of the hand bounding box are computed and normalized based on the bounding box's width and height. These normalized distances serve as input for the hand gesture recognition process. This process yields 42 features (derived from 21 keypoints with x and y coordinates). An example keypoint detection is shown below:
+During pre-processing, hand keypoints are detected using YOLOv11. Images that do not yield detected keypoints are omitted from the dataset. After keypoint extraction, the relative distances from the top-left corner of the hand bounding box are computed and normalized based on the bounding box's width and height. These normalized distances serve as input for the hand gesture recognition process. This process yields 42 features (derived from 21 keypoints with x and y coordinates).
 
-![Keypoint detection example](assets/keypoint_250.jpg)
+| Type | Example |
+|------|---------|
+| Keypoint Detection | ![Keypoint detection example](assets/keypoint_250.jpg) |
 
 ### Dataset Structure
 
@@ -80,25 +82,14 @@ The number of images per class is as follows:
 
 Thus, the dataset is well-balanced.
 
-#### Examples of Class "five"
+#### Examples of Gestures by Class
 
-![Example of "five" gesture](assets/five/04f07807-463b-4120-9187-0242faf587dd.jpg)
-![Example of "five" gesture](assets/five/10.jpg)
-
-#### Examples of Class "four"
-
-![Example of "four" gesture](assets/four/00c7d5f3-ff27-455c-8b6e-cdc54aaaf427.jpg)
-![Example of "four" gesture](assets/four/10.jpg)
-
-#### Examples of Class "stop"
-
-![Example of "stop" gesture](assets/stop/00d0a827-e4e1-4f74-99d8-b1880d06e5ee.jpg)
-![Example of "stop" gesture](assets/stop/0.jpg)
-
-#### Examples of Class "none"
-
-![Example of "none" gesture](assets/none/05210ce0-ef4d-4f43-b832-35166e10b403.jpg)
-![Example of "none" gesture](assets/none/0.jpg)
+| Class | Example 1 | Example 2 |
+|-------|-----------|-----------|
+| five | ![Example of "five" gesture](assets/five/04f07807-463b-4120-9187-0242faf587dd.jpg) | ![Example of "five" gesture](assets/five/10.jpg) |
+| four | ![Example of "four" gesture](assets/four/00c7d5f3-ff27-455c-8b6e-cdc54aaaf427.jpg) | ![Example of "four" gesture](assets/four/10.jpg) |
+| stop | ![Example of "stop" gesture](assets/stop/00d0a827-e4e1-4f74-99d8-b1880d06e5ee.jpg) | ![Example of "stop" gesture](assets/stop/0.jpg) |
+| none | ![Example of "none" gesture](assets/none/05210ce0-ef4d-4f43-b832-35166e10b403.jpg) | ![Example of "none" gesture](assets/none/0.jpg) |
 
 ## Model Selection and Training
 
@@ -250,14 +241,18 @@ Features:
 - Error handling for invalid inputs or failed detections
 - Shareable interface (can be accessed via network)
 
-![GUI Screenshot showing tabs for upload and webcam modes](assets/gui_screenshot.png)
-![GUI Screenshot showing tabs for upload and webcam modes](assets/gui_webcam.png)
+#### GUI Screenshots
+
+| Mode | Screenshot |
+|------|------------|
+| Upload Interface | ![GUI Screenshot showing upload mode](assets/gui_screenshot.png) |
+| Webcam Interface | ![GUI Screenshot showing webcam mode](assets/gui_webcam.png) |
 
 The GUI provides instant feedback with the predicted gesture class or error messages if detection fails. For webcam mode, predictions are continuously updated while maintaining reasonable performance.
 
 #### GUI Application Demo
 
-A demo of the GUI application is available below. ![GUI application demo](assets/gui-demo.gif).
+A demo of the GUI application is available below. ![GUI application demo](assets/gui-demo.gif)
 
 ## Performance Considerations
 
