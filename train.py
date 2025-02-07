@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
@@ -59,17 +60,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    model_path = Path(args.model_path).resolve()
+    data_root = Path(args.data_root).resolve()
+
     json_paths = {
-        "five": f"{args.data_root}/five/bbox_keypoints.json",
-        "four": f"{args.data_root}/four/bbox_keypoints.json",
-        "stop": f"{args.data_root}/stop/bbox_keypoints.json",
-        "none": f"{args.data_root}/none/bbox_keypoints.json",
+        "five": (data_root / "five" / "bbox_keypoints.json").as_posix(),
+        "four": (data_root / "four" / "bbox_keypoints.json").as_posix(),
+        "stop": (data_root / "stop" / "bbox_keypoints.json").as_posix(),
+        "none": (data_root / "none" / "bbox_keypoints.json").as_posix(),
     }
     df = load_and_combine(json_paths)
     df_train, df_val = create_train_val_split(df)
-    model_save_path = args.model_path
+    model_save_path = model_path
     predictor: TabularPredictor = train_model(df_train, df_val, model_save_path)
-    print("Model trained and saved at:", model_save_path)
+    print("Model trained and saved at:", model_save_path.as_posix())
 
 
 if __name__ == "__main__":

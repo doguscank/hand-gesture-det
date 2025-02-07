@@ -1,5 +1,6 @@
 import json
 from typing import Any, Dict, List, Tuple
+from pathlib import Path
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
@@ -21,6 +22,7 @@ def load_and_flatten(json_path: str, label_map: Dict[str, str]) -> pd.DataFrame:
     pd.DataFrame
         DataFrame with flattened keypoints and corresponding labels.
     """
+    json_path = Path(json_path).resolve()
     with open(json_path, "r") as f:
         data = json.load(f)
     records = []
@@ -50,7 +52,8 @@ def load_and_combine(json_paths: Dict[str, str]) -> pd.DataFrame:
     """
     records = []
     for cls, json_path in json_paths.items():
-        with open(json_path, "r") as f:
+        path = Path(json_path).resolve()
+        with open(path, "r") as f:
             data = json.load(f)
         for sample, details in data.items():
             record = {}
@@ -105,7 +108,8 @@ def load_model(model_path: str) -> TabularPredictor:
     TabularPredictor
         Loaded AutoGluon predictor.
     """
-    return TabularPredictor.load(model_path)
+    model_path = Path(model_path).resolve()
+    return TabularPredictor.load(str(model_path))
 
 
 def build_features_from_keypoints(keypoints: List[Dict[str, Any]]) -> Dict[str, float]:
@@ -128,3 +132,25 @@ def build_features_from_keypoints(keypoints: List[Dict[str, Any]]) -> Dict[str, 
         features[f"kp{idx}_rel_x"] = kp.get("rel_x", 0)
         features[f"kp{idx}_rel_y"] = kp.get("rel_y", 0)
     return features
+
+
+def save_results(name: str, data: Dict[str, Any], output_dir: str) -> None:
+    """
+    Save results to a JSON file.
+
+    Parameters
+    ----------
+    name : str
+        Name of the output file.
+    data : dict of {str: Any}
+        Data to be saved.
+    output_dir : str
+        Directory where the output file will be saved.
+
+    Returns
+    -------
+    None
+    """
+    output_file = (Path(output_dir).resolve() / name / "bbox_keypoints.json").resolve()
+    with open(output_file, "w") as f:
+        json.dump(data, f)

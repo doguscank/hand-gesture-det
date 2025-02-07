@@ -1,5 +1,6 @@
 import argparse
 import json
+from pathlib import Path
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
@@ -46,17 +47,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    model_path = Path(args.model_path).resolve()
+    data_root = Path(args.data_root).resolve()
+    mapping_out = Path(args.mapping_out).resolve()
+
     json_paths = {
-        "five": f"{args.data_root}/five/bbox_keypoints.json",
-        "four": f"{args.data_root}/four/bbox_keypoints.json",
-        "stop": f"{args.data_root}/stop/bbox_keypoints.json",
-        "none": f"{args.data_root}/none/bbox_keypoints.json",
+        "five": (data_root / "five" / "bbox_keypoints.json").as_posix(),
+        "four": (data_root / "four" / "bbox_keypoints.json").as_posix(),
+        "stop": (data_root / "stop" / "bbox_keypoints.json").as_posix(),
+        "none": (data_root / "none" / "bbox_keypoints.json").as_posix(),
     }
     df = load_and_combine(json_paths)
 
     # Obtain validation split
     _, df_val = create_train_val_split(df)
-    model_path = args.model_path
     predictor: TabularPredictor = load_model(model_path)
     df_val_features = df_val.drop(columns=["class", "img_path"])
     val_predictions = predictor.predict(df_val_features)
@@ -81,10 +85,9 @@ def main() -> None:
     print("Classification Report:")
     print(report)
 
-    mapping_out = args.mapping_out
-    with open(mapping_out, "w") as f:
+    with mapping_out.open("w") as f:
         json.dump(mapping, f)
-    print("Validation mapping saved at:", mapping_out)
+    print("Validation mapping saved at:", mapping_out.as_posix())
 
 
 if __name__ == "__main__":

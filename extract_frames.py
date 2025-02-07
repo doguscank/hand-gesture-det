@@ -1,5 +1,6 @@
 import os
 from typing import Dict, List
+from pathlib import Path
 
 import cv2
 
@@ -26,16 +27,18 @@ def process_video(
     int
         The final frame count after processing the video.
     """
-    cap = cv2.VideoCapture(video_path)
+    video_path = Path(video_path).resolve()
+    cap = cv2.VideoCapture(str(video_path))
     frame_count = start_frame
-    os.makedirs(save_dir, exist_ok=True)
+    save_dir = Path(save_dir).resolve()
+    save_dir.mkdir(parents=True, exist_ok=True)
 
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
         if frame_count % save_each_n_frame == 0:
-            cv2.imwrite(os.path.join(save_dir, f"{frame_count}.jpg"), frame)
+            cv2.imwrite(str(save_dir / f"{frame_count}.jpg"), frame)
         frame_count += 1
     cap.release()
     return frame_count
@@ -59,11 +62,10 @@ def extract_frames_from_videos(
     for name, paths in video_paths.items():
         frame_count = 0
         for path in paths:
-            # Format the save directory for this label
-            save_dir = save_path_template.format(name=name)
-            frame_count = process_video(
-                path, save_dir, save_each_n_frame, start_frame=frame_count
-            )
+            # Convert each video path to an absolute path
+            video_abs = Path(path).resolve()
+            save_dir = Path(save_path_template.format(name=name)).resolve()
+            frame_count = process_video(str(video_abs), str(save_dir), save_each_n_frame, start_frame=frame_count)
 
 
 if __name__ == "__main__":

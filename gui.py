@@ -1,28 +1,39 @@
 import cv2
 import gradio as gr
 import pandas as pd
+import numpy as np
 from autogluon.tabular import TabularPredictor
+from pathlib import Path
 
 from det_keypoints import detect_keypoints, init_detector
 from utils import build_features_from_keypoints
 
 # Load models using fixed paths
-YOLO_WEIGHTS = "./weights/yolo-best.pt"
-AUTOGLUON_MODEL_PATH = "./weights/autogluon_model"
+YOLO_WEIGHTS = Path("./weights/yolo-best.pt").resolve()
+AUTOGLUON_MODEL_PATH = Path("./weights/autogluon_model").resolve()
 
-yolo_model_instance = init_detector(YOLO_WEIGHTS)
-predictor = TabularPredictor.load(AUTOGLUON_MODEL_PATH)
+yolo_model_instance = init_detector(str(YOLO_WEIGHTS))
+predictor = TabularPredictor.load(str(AUTOGLUON_MODEL_PATH))
 
 
 def predict(image):
     """Predicts hand gesture class from an image."""
-    if image is None or image.size == 0:
-        return "Error: Invalid image input."
+    if image is None:
+        return "Error: No image provided."
+
+    # Ensure image is a NumPy array
+    if not isinstance(image, np.ndarray):
+        return "Error: Invalid image format."
+
+    # Ensure image has valid dimensions
+    if len(image.shape) != 3 or image.shape[2] != 3:
+        return "Error: Image must be a 3-channel color image."
 
     try:
+        # Convert image from RGB to BGR
         img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        detection = detect_keypoints(img_bgr, yolo_model_instance)
 
+        detection = detect_keypoints(img_bgr, yolo_model_instance)
         if detection is None or not detection.get("keypoints"):
             return "Error: No keypoints detected."
 
@@ -41,7 +52,10 @@ with gr.Blocks() as demo:
     with gr.Tabs():
         with gr.Tab("Upload Image"):
             img_upload = gr.Image(
-                label="Upload Image", type="numpy", sources=["upload"]
+                label="Upload Image",
+                type="numpy",
+                sources=["upload"],
+                format="png",
             )
             btn_upload = gr.Button("Predict")
             out_upload = gr.Textbox(label="Prediction")
@@ -49,7 +63,10 @@ with gr.Blocks() as demo:
 
         with gr.Tab("Webcam"):
             img_webcam = gr.Image(
-                sources=["webcam"], streaming=True, label="Webcam Feed", type="numpy"
+                label="Webcam Feed",
+                type="numpy",
+                source="webcam",
+                streaming=True,
             )
             out_webcam = gr.Textbox(label="Prediction")
             img_webcam.stream(

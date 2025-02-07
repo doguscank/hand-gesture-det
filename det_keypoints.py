@@ -2,6 +2,7 @@ import json
 import os
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional, Tuple
+from pathlib import Path
 
 from ultralytics import YOLO
 
@@ -165,6 +166,6 @@ def save_results(name: str, data: Dict[str, Any], output_dir: str) -> None:
     output_dir : str
         Directory where the output file will be saved.
     """
-    output_file = f"{output_dir}/{name}/bbox_keypoints.json"
+    output_file = (Path(output_dir).resolve() / name / "bbox_keypoints.json").resolve()
     with open(output_file, "w") as f:
         json.dump(data, f)

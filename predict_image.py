@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import cv2
 import pandas as pd
@@ -30,14 +31,16 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Load image
-    image = cv2.imread(args.image)
+    image_path = Path(args.image).resolve()
+    # Load image using string path
+    image = cv2.imread(str(image_path))
     if image is None:
         print("Error: Unable to read the image.")
         return
 
-    # Load YOLO model and perform keypoint detection
-    yolo = init_detector(args.yolo_model)
+    yolo_model_path = Path(args.yolo_model).resolve()
+    # Load YOLO model using absolute path string
+    yolo = init_detector(str(yolo_model_path))
     detection = detect_keypoints(image, yolo)
     if detection is None or not detection.get("keypoints"):
         print("Error: No keypoints detected.")
@@ -47,8 +50,9 @@ def main() -> None:
     features = build_features_from_keypoints(detection["keypoints"])
     df = pd.DataFrame([features])
 
+    autogluon_model_path = Path(args.autogluon_model).resolve()
     # Load AutoGluon model and predict class
-    predictor: TabularPredictor = TabularPredictor.load(args.autogluon_model)
+    predictor: TabularPredictor = TabularPredictor.load(str(autogluon_model_path))
     prediction = predictor.predict(df)
     print("Predicted Class:", prediction.iloc[0])
 
