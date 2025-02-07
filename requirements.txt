@@ -1,0 +1,8 @@
+autogluon==1.2
+gradio==5.15.0
+numpy==1.26.4
+opencv-python==4.11.0.86
+pandas==2.2.3
+scikit-learn==1.5.2
+ultralytics==8.3.71
+virtualenv==20.29.1
