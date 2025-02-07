@@ -1,9 +1,16 @@
+import os
+import pathlib
+from pathlib import Path
+
 import cv2
 import gradio as gr
-import pandas as pd
 import numpy as np
+import pandas as pd
 from autogluon.tabular import TabularPredictor
-from pathlib import Path
+
+if os.name == "nt":
+    temp = pathlib.PosixPath
+    pathlib.PosixPath = pathlib.WindowsPath
 
 from det_keypoints import detect_keypoints, init_detector
 from utils import build_features_from_keypoints
@@ -21,16 +28,13 @@ def predict(image):
     if image is None:
         return "Error: No image provided."
 
-    # Ensure image is a NumPy array
     if not isinstance(image, np.ndarray):
         return "Error: Invalid image format."
 
-    # Ensure image has valid dimensions
     if len(image.shape) != 3 or image.shape[2] != 3:
         return "Error: Image must be a 3-channel color image."
 
     try:
-        # Convert image from RGB to BGR
         img_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
         detection = detect_keypoints(img_bgr, yolo_model_instance)
@@ -65,7 +69,7 @@ with gr.Blocks() as demo:
             img_webcam = gr.Image(
                 label="Webcam Feed",
                 type="numpy",
-                source="webcam",
+                sources=["webcam"],
                 streaming=True,
             )
             out_webcam = gr.Textbox(label="Prediction")
